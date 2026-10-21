@@ -32,14 +32,55 @@ public function autenticar(){
     }
 
     $email = trim($_POST['email']);
-    $senha = trim($_POST['senha']);
+    $senha =($_POST['senha']);
+
+
     if(empty($email) || empty($senha)){
         $erro="preencha seu email e senha";
         include __DIR__ . "/../view/login.php";
 
 
     }
+
+    $usuario = $this->usuarioModel->buscarEm();
+
+    if($usuario && password_verify($senha, $usuario['$senha'])){
+
+        session_regenerate_id(true);
+        $_SESSION['id'] = $usuario['id'];
+        $_SESSION['nome'] = $usuario['nome'];
+
+        header("Location:index.php?action=painel");
+
+        $erro= "Email ou senha estão incorretos";
+
+        include __DIR__ . '/../view/login.php';
+
+
+
+    }
+
 }
+
+public function painel() {
+
+    if(!isset($_SESSION['id'])) {
+
+        header("Location: index.php");
+        exit;
+        
+
+    }
+    include __DIR__ . '/../view/painel.php';
+
+}
+
+   public  function logout(){
+    session_destroy();
+
+    header("Location: index.php");
+    exit;
+   }
 
 }
 
